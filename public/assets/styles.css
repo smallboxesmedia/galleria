@@ -1,0 +1,193 @@
+
+:root{
+  --gap:8px;
+  --thumb-height:180px;
+  --topbar-h:100px;
+  --bg:#f3eeec;
+  --text:#131315;
+  --muted:#131315;
+  --accent:#cb5353;
+  --velaris: #ffecd2;
+  --folder-accent: #e8cfc8;
+}
+
+* {
+  box-sizing: border-box
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Floating pill nav */
+#topbar{
+  position: fixed;           /* stays on screen */
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 990;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  /* pill look */
+  background: var(--folder-accent);
+  box-shadow: 0 6px 24px rgba(0,0,0,.35);
+  border-radius: 9999px;
+
+  padding: 8px 24px;
+  height: auto;
+  max-width: min(92vw, 1100px);
+  overflow: hidden;          /* keeps pill tidy if crumbs long */
+}
+
+/* Breadcrumb inside the pill */
+#breadcrumb{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+#breadcrumb a, #breadcrumb span{
+  color: var(--text);
+  text-decoration: none;
+  opacity: .9;
+}
+#breadcrumb a:hover{ opacity: 1 }
+#breadcrumb .sep{ opacity: .5 }
+
+.indexlink {
+  text-decoration: none;
+  color: var(--text);
+  font-weight: bold;
+  margin-right: 8px;
+}
+
+/* Let long paths be scrollable on touch without breaking the pill */
+@media (max-width: 680px){
+  #breadcrumb{
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  #breadcrumb::-webkit-scrollbar{ display: none; }
+}
+
+
+/* Content */
+
+#content {
+  max-width: 90vw;
+  margin: auto;
+  padding:16px;
+  padding-top: var(--topbar-h);
+  display: flex;
+  justify-content: center;
+}
+
+.folder-title {
+  display: none;
+  font-size:20px; font-weight:600; margin:8px 0 16px 0; color: var(--text);
+}
+
+.tiles {
+  display:flex; 
+  flex-wrap:wrap;
+  justify-content: center;
+  gap:var(--gap);
+}
+
+.tile {
+  text-decoration:none; 
+  color:inherit;
+  border-radius:10px;
+  padding:0px; width:fit-content;
+  transition:transform .12s ease, border-color .12s ease;
+}
+.tile:hover { transform:translateY(-2px); border-color:#333 }
+
+.thumb {
+  display:block;
+  height:var(--thumb-height);
+  max-width:min(90vw, 100%);
+  object-fit:cover;
+  border-radius:8px;
+  background: var(--velaris);
+}
+
+.tile .label {
+  display: none;
+}
+
+.folder-tile .label {
+  display: block;
+  margin:6px; color:var(--muted); font-size:11px;
+  text-align: center;
+  word-break:break-word; max-width:480px;
+}
+
+/* give folder tiles a coloured border */
+.folder-tile {
+  padding: 0px;
+  background: var(--folder-accent);
+}
+.folder-tile:nth-child(6n)::after {
+  content: "";
+  flex-basis: 100%;
+  width: 0;
+}
+
+
+/* (optional) a subtle glow on hover so they feel 'navigational' */
+.folder-tile:hover .thumb{
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--folder-accent) 20%, transparent);
+}
+
+/* Lightbox */
+.lightbox[aria-hidden="true"]{ display:none }
+.lightbox{
+  position:fixed; inset:0; z-index:999;
+  background:rgba(0,0,0,.85);
+  display:flex; align-items:center; justify-content:center;
+}
+.lb-stage{
+  position:relative; width:min(92vw, 1600px); height:min(88vh, 1000px);
+  display:flex; align-items:center; justify-content:center;
+}
+.lb-media{ width:100%; height:100%; display:flex; align-items:center; justify-content:center }
+.lb-media img, .lb-media video{ max-width:100%; max-height:100%; border-radius:10px }
+
+.lb-close{
+  position:absolute; top:8px; right:12px;
+  font-size:36px; background:none; border:0; color:#fff; cursor:pointer;
+  line-height:1; padding:4px 8px;
+}
+.lb-prev, .lb-next{
+  position:absolute; top:50%; transform:translateY(-50%);
+  width:8%; min-width:48px; height:32%;
+  background:transparent; border:0; color:#fff; cursor:pointer;
+  font-size: 2rem;
+  outline:none;
+}
+.lb-prev{ left:0 }
+.lb-next{ right:0 }
+.lb-prev:hover, .lb-next:hover{ outline:2px solid rgba(255,255,255,.15); outline-offset:-2px }
+
+/* Ensure prev/next hit areas are narrow & mid-height to avoid close icon and video controls */
+@media (max-width: 768px){
+  .lb-prev, .lb-next{ height:28% }
+}
+
+.video-tile .thumb{ object-fit:cover }
+.folder-tile .thumb{ object-fit:cover }
+
+.hidden{ display:none }

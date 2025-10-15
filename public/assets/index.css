@@ -1,0 +1,51 @@
+:root {
+  --contentwidth:min(92vw, 1100px);
+}
+
+#topbar {
+  width: 100%;
+}
+
+#content-index {
+  max-width: var(--contentwidth);
+  margin: auto;
+}
+
+.toplink {
+  text-decoration: none;
+  color: var(--text);
+  margin-right: 8px;
+}
+
+.heroimage {
+  max-width: var(--contentwidth);
+  margin: auto;
+  margin-top: var(--topbar-h)
+}
+.heroimage img {
+  width: 100%;
+  border-radius: 20px;
+}
+
+.container-cards {
+  display: flex;
+  margin: 2rem 0;
+}
+.card {
+  width: 1fr;
+  margin: 0 10px 10px 0;
+}
+.card img {
+  width: 100%;
+  border-radius: 20px;
+}
+a.btn {
+  display: inline-block;
+  width: 100%;
+  text-align: center;
+  background: var(--folder-accent);
+  border-radius: 9999px;
+  padding: 6px 20px;
+  color: #000000;
+  text-decoration: none;
+}

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width,initial-scale=1" />
+	<title>Galleria</title>
+	<link rel="stylesheet" href="assets/styles.css" />
+</head>
+
+<body>
+	<!-- Floating breadcrumb pill -->
+	<header id="topbar">
+		<a href="index.html" class="indexlink">Galleria</a>
+		<nav id="breadcrumb"></nav>
+	</header>
+
+	<main id="content">
+		<div id="folder-title" class="folder-title"></div>
+		<div id="tiles" class="tiles"></div>
+	</main>
+
+	<!-- Lightbox -->
+	<div id="lightbox" class="lightbox" aria-hidden="true">
+		<button class="lb-close" id="lbClose" aria-label="Close">&times;</button>
+		<div class="lb-stage">
+			<button class="lb-prev" id="lbPrev" aria-label="Previous">&laquo;</button>
+			<div class="lb-media" id="lbMedia"></div>
+			<button class="lb-next" id="lbNext" aria-label="Next">&raquo;</button>
+		</div>
+	</div>
+
+	<script type="module" src="assets/app.js"></script>
+</body>
+
+</html>
