@@ -78,7 +78,3 @@ Each script automates a part of the gallery workflow: thumbnail creation, indexi
 ***
 
 For more details and extended customization, refer to specific script implementations and adjust according to your media requirements.
-
-<div align="center">⁂</div>
-
-[^1]: package.json
