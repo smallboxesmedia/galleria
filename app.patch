@@ -1,0 +1,165 @@
+diff --git a/public/assets/app.js b/public/assets/app.js
+index a9fba32d3351387c00e4f134a1a110f89b58fe00..53c48801f7653613b947d5280625a546d625cb57 100644
+--- a/public/assets/app.js
++++ b/public/assets/app.js
+@@ -1,28 +1,32 @@
+ const tilesEl = document.getElementById("tiles");
+ const crumbEl = document.getElementById("breadcrumb");
+ const folderTitleEl = document.getElementById("folder-title");
++const folderFilterInput = document.getElementById("folderFilter");
++
++let iso = null;
++let folderFilterQuery = "";
+ 
+ const lb = {
+   el: document.getElementById("lightbox"),
+   media: document.getElementById("lbMedia"),
+   btnPrev: document.getElementById("lbPrev"),
+   btnNext: document.getElementById("lbNext"),
+   btnClose: document.getElementById("lbClose"),
+   items: [],
+   idx: -1
+ };
+ 
+ function decodePathFromHash() { const q = new URLSearchParams(location.hash.slice(1)); return q.get("path") || ""; }
+ 
+ function setPath(path) { const q = new URLSearchParams(); if (path) q.set("path", path);
+   location.hash = q.toString(); }
+ 
+ function breadcrumb(path) {
+   crumbEl.innerHTML = "";
+   const parts = path.split("/").filter(Boolean);
+   const add = (label, p, isLast) => {
+	 if (isLast) { const span = document.createElement("span");
+	   span.textContent = label || "Home";
+	   crumbEl.appendChild(span); } else { const a = document.createElement("a");
+	   a.href = "#";
+	   a.textContent = label || "Home";
+@@ -83,52 +87,89 @@ function renderTiles(data, path) {
+	 img.alt = m.name;
+	 img.loading = "lazy";
+	 img.src = m.thumb;
+	 a.appendChild(img);
+ 
+	 const label = document.createElement("div");
+	 label.className = "label";
+	 label.textContent = m.name;
+	 a.appendChild(label);
+ 
+	 // ✅ Push both images and videos into the lightbox playlist
+	 const idx = lb.items.length;
+	 lb.items.push({
+	   type: m.type, // "image" | "video"
+	   src: m.src,
+	   name: m.name,
+	   poster: m.poster || m.thumb
+	 });
+ 
+	 a.onclick = (e) => { e.preventDefault();
+	   openLightbox(idx); };
+ 
+	 tilesEl.appendChild(a);
+   });
+ 
++  refreshIsotope();
++}
++
++function folderMatchesFilter(el) {
++  if (!folderFilterQuery) return true;
++  const label = el.querySelector(".label")?.textContent || "";
++  return label.toLowerCase().includes(folderFilterQuery);
++}
++
++function applyFolderFilter() {
++  if (iso) {
++    iso.arrange({
++      filter: (itemElem) =>
++        itemElem.classList.contains("folder-tile") ? folderMatchesFilter(itemElem) : true
++    });
++  } else {
++    tilesEl.querySelectorAll(".folder-tile").forEach((tile) => {
++      tile.classList.toggle("hidden", !folderMatchesFilter(tile));
++    });
++  }
++}
++
++function refreshIsotope() {
++  folderFilterQuery = (folderFilterInput?.value || "").trim().toLowerCase();
++  if (window.Isotope) {
++    if (!iso) {
++      iso = new Isotope(tilesEl, {
++        itemSelector: ".tile",
++        layoutMode: "fitRows",
++        transitionDuration: "0.2s"
++      });
++    } else {
++      iso.reloadItems();
++    }
++  }
++  applyFolderFilter();
+ }
+ 
++
+ // Lightbox
+ function openLightbox(i) { lb.idx = i;
+   lb.el.setAttribute("aria-hidden", "false");
+   renderLB(); }
+ 
+ function renderLB() {
+   lb.media.innerHTML = "";
+ 
+   const item = lb.items[lb.idx];
+ 
+   if (item.type === "video") {
+	 const v = document.createElement("video");
+	 v.src = item.src;
+	 v.controls = true;
+	 v.playsInline = true;
+	 if (item.poster) v.poster = item.poster;
+	 // optional: start paused to avoid surprising users
+	 // v.autoplay = true; // enable if you prefer auto-play
+	 v.autoplay = true;
+	 lb.media.appendChild(v);
+   } else {
+	 const img = document.createElement("img");
+	 img.src = item.src;
+	 img.alt = item.name || "";
+	 lb.media.appendChild(img);
+@@ -150,30 +191,35 @@ function stopVideoIfAny() {
+ function closeLB(){
+   stopVideoIfAny();
+   lb.el.setAttribute("aria-hidden","true");
+   lb.media.innerHTML = "";
+   document.body.style.overflow = "";
+ }
+ 
+ function prevLB(){
+   if (lb.items.length === 0) return;
+   stopVideoIfAny();
+   lb.idx = (lb.idx - 1 + lb.items.length) % lb.items.length;
+   renderLB();
+ }
+ function nextLB(){
+   if (lb.items.length === 0) return;
+   stopVideoIfAny();
+   lb.idx = (lb.idx + 1) % lb.items.length;
+   renderLB();
+ }
+ 
+ document.getElementById("lbClose").addEventListener("click", closeLB);
+ document.getElementById("lbPrev").addEventListener("click", prevLB);
+ document.getElementById("lbNext").addEventListener("click", nextLB);
+ document.addEventListener("keydown", (e) => { if (lb.el.getAttribute("aria-hidden") === "true") return; if (e.key === "Escape") closeLB(); if (e.key === "ArrowLeft") prevLB(); if (e.key === "ArrowRight") nextLB(); });
+ 
++folderFilterInput?.addEventListener("input", () => {
++  folderFilterQuery = (folderFilterInput.value || "").trim().toLowerCase();
++  applyFolderFilter();
++});
++
+ async function render() { const p = decodePathFromHash();
+   breadcrumb(p); try { const data = await fetchFolder(p);
+	 renderTiles(data, p); } catch { tilesEl.innerHTML = '<div style="opacity:.7">Folder not found.</div>'; } }
+ window.addEventListener("hashchange", render);
+-render();
+\ No newline at end of file
++render();
